@@ -9,6 +9,7 @@ import {
   analyzeJobDescriptionMatch,
   generateRewriteSuggestions,
   generateInterviewReadiness,
+  generateResumeHtml,
 } from "../services/resumeLLMService";
 import { AppError, ErrorCode } from "../types/errors";
 import { logger } from "../utils/logger";
@@ -452,6 +453,53 @@ router.post(
       });
     } catch (error) {
       logger.error("Failed to save resume version", error);
+      return sendErrorResponse(res, error);
+    }
+  }
+);
+
+//////////////////////////////////////////////////////////////////
+// 🔐 EXPORT REWRITTEN RESUME AS DOCX
+//////////////////////////////////////////////////////////////////
+
+router.post(
+  "/export",
+  protect,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const { final_resume_text } = req.body;
+
+      if (!final_resume_text || typeof final_resume_text !== "string") {
+        throw new AppError(
+          ErrorCode.VALIDATION_ERROR,
+          "final_resume_text is required"
+        );
+      }
+
+      // Generate HTML from the text using LLM
+      const htmlContent = await generateResumeHtml(final_resume_text);
+
+      // Convert HTML to DOCX buffer
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const HTMLtoDOCX = require("html-to-docx");
+      const fileBuffer = await HTMLtoDOCX(htmlContent, null, {
+        table: { row: { cantSplit: true } },
+        footer: true,
+        pageNumber: true,
+      });
+
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        "attachment; filename=rewritten_resume.docx"
+      );
+      
+      return res.status(200).send(fileBuffer);
+    } catch (error) {
+      logger.error("Failed to export DOCX", error);
       return sendErrorResponse(res, error);
     }
   }

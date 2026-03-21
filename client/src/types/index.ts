@@ -90,3 +90,17 @@ export interface ResumeVersion {
 
 // UI State Types
 export type ProcessingState = 'idle' | 'uploading' | 'processing' | 'complete' | 'error';
+
+export interface Job {
+    id: number;
+    url: string;
+    title: string;
+    company_name: string;
+    company_logo: string;
+    category: string;
+    job_type: string;
+    publication_date: string;
+    candidate_required_location: string;
+    salary: string;
+    description: string;
+}

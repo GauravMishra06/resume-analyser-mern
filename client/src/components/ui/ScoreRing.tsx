@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 interface ScoreRingProps {
     score: number;
@@ -77,13 +77,14 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
     const gradientId = React.useId();
 
     // Animation variants
-    const circleVariants = {
+    const ringEase: [number, number, number, number] = [0.16, 1, 0.3, 1];
+    const circleVariants: Variants = {
         hidden: { strokeDashoffset: circumference },
         visible: {
             strokeDashoffset,
             transition: {
                 duration: 1.5,
-                ease: [0.16, 1, 0.3, 1],
+                ease: ringEase,
                 delay: 0.2
             }
         }

@@ -2,9 +2,21 @@ import fs from "fs";
 import path from "path";
 import { pdfToPng, PngPageOutput } from "pdf-to-png-converter";
 import mammoth from "mammoth";
-import pdfParse from "pdf-parse";
 import { AppError, ErrorCode } from "../types/errors";
 import { logger } from "../utils/logger";
+
+const pdfParseModule = require("pdf-parse") as {
+    PDFParse?: new (opts: { data: Uint8Array }) => {
+        getText: () => Promise<{ text?: string }>;
+        destroy?: () => Promise<void>;
+    };
+    default?: {
+        PDFParse?: new (opts: { data: Uint8Array }) => {
+            getText: () => Promise<{ text?: string }>;
+            destroy?: () => Promise<void>;
+        };
+    };
+};
 
 /**
  * Prepared file data for AI analysis
@@ -106,21 +118,34 @@ async function convertPdfToImages(buffer: Buffer): Promise<string[]> {
 }
 
 /**
-/**
  * Extract text from PDF buffer using pdf-parse
  */
 async function extractPdfText(buffer: Buffer): Promise<string> {
+    let parser: { getText: () => Promise<{ text?: string }>; destroy?: () => Promise<void> } | null = null;
     try {
-        const data = await pdfParse(buffer);
+        const PDFParseCtor = pdfParseModule.PDFParse || pdfParseModule.default?.PDFParse;
+
+        if (!PDFParseCtor) {
+            logger.warn("pdf-parse v2 parser constructor not found; skipping PDF text extraction");
+            return "";
+        }
+
+        parser = new PDFParseCtor({ data: new Uint8Array(buffer) });
+        const data = await parser.getText();
         const text = data.text?.trim() || "";
         logger.info(`Extracted ${text.length} characters from PDF`);
         return text;
     } catch (err) {
         logger.warn("PDF text extraction failed (non-fatal):", err instanceof Error ? err.message : String(err));
         return "";
+    } finally {
+        if (parser?.destroy) {
+            await parser.destroy().catch(() => undefined);
+        }
     }
 }
 
+/**
  * Extract text from DOCX file
  */
 async function extractDocxText(buffer: Buffer): Promise<string> {
@@ -203,10 +228,26 @@ export async function prepareFileForAnalysis(
 
     if (isPdfFile(ext)) {
         logger.info(`Processing PDF file: ${originalName}`);
-        const [images, pdfText] = await Promise.all([
-            convertPdfToImages(buffer),
-            extractPdfText(buffer),
-        ]);
+        const pdfText = await extractPdfText(buffer);
+
+        let images: string[] | undefined;
+        try {
+            images = await convertPdfToImages(buffer);
+        } catch (err) {
+            logger.warn(
+                "PDF image conversion failed; proceeding with extracted text only",
+                err instanceof Error ? err.message : String(err)
+            );
+        }
+
+        if ((!images || images.length === 0) && !pdfText) {
+            throw new AppError(
+                ErrorCode.FILE_CONVERSION_ERROR,
+                "Failed to process PDF",
+                "Could not extract readable text or convert PDF pages to images"
+            );
+        }
+
         return {
             originalName,
             extension: ext,

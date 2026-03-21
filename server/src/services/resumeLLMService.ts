@@ -595,3 +595,52 @@ export async function analyzeResumeWithVision(
         );
     }
 }
+
+/**
+ * Generate formatted HTML from raw resume text
+ */
+export async function generateResumeHtml(resumeText: string): Promise<string> {
+    const prompt = `You are a professional resume formatter.
+Take the provided resume text and format it into clean, semantic HTML.
+Rules:
+- DO NOT wrap the response in \`\`\`html or any markdown blocks. Return pure HTML only.
+- DO NOT invent or remove any information. Only rely on the provided text.
+- Use <h1> for the name.
+- Use <p> for contact information.
+- Use <h2> for section headers (e.g., Experience, Education, Skills).
+- Use <h3> for job titles or degrees.
+- Use <ul> and <li> for bullet points.
+- Use <p> for descriptions.
+- Keep the HTML markup clean and well-structured, without CSS or inline styles.
+
+Resume Text:
+${resumeText}`;
+
+    const model = getGeminiClient().getGenerativeModel({
+        model: TEXT_MODEL,
+        generationConfig,
+        safetySettings,
+    });
+
+    try {
+        const result = await model.generateContent(prompt);
+        let content = result.response.text() || '';
+
+        // Strip markdown code blocks if the model ignored the rule
+        if (content.startsWith('\`\`\`html') && content.endsWith('\`\`\`')) {
+            content = content.replace(/^\`\`\`html\n?/, '').replace(/\n?\`\`\`$/, '');
+        } else if (content.startsWith('\`\`\`') && content.endsWith('\`\`\`')) {
+            content = content.replace(/^\`\`\`\n?/, '').replace(/\n?\`\`\`$/, '');
+        }
+
+        return content.trim();
+    } catch (error) {
+        logger.error('Failed to generate HTML from LLM', error);
+        throw new AppError(
+            ErrorCode.AI_ANALYSIS_ERROR,
+            'HTML formatting failed',
+            error instanceof Error ? error.message : String(error)
+        );
+    }
+}
+

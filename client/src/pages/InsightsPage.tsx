@@ -25,6 +25,8 @@ import {
     generateRewriteStudio,
     getResumeVersions,
     saveResumeVersion,
+    searchActiveJobs,
+    exportResumeDocx,
 } from '../services/api';
 import type {
     InterviewReadinessResponse,
@@ -32,6 +34,7 @@ import type {
     ResumeAnalysisResponse,
     ResumeVersion,
     RewriteResponse,
+    Job,
 } from '../types';
 
 interface LocationState {
@@ -42,7 +45,7 @@ interface LocationState {
     resumeId?: string;
 }
 
-type LabTab = 'overview' | 'rewrite' | 'match' | 'interview' | 'timeline';
+type LabTab = 'overview' | 'rewrite' | 'match' | 'interview' | 'timeline' | 'jobs';
 
 function getSuitability(score: number): { text: string; variant: 'success' | 'warning' | 'error'; color: string } {
     if (score >= 7) return { text: 'Strong Match', variant: 'success', color: 'text-success' };
@@ -67,6 +70,7 @@ const InsightsPage: React.FC = () => {
     const [rewriteError, setRewriteError] = useState<string | null>(null);
     const [acceptedRewrites, setAcceptedRewrites] = useState<Record<string, boolean>>({});
     const [savingVersion, setSavingVersion] = useState(false);
+    const [exportingDocx, setExportingDocx] = useState(false);
 
     const [interview, setInterview] = useState<InterviewReadinessResponse | null>(null);
     const [interviewLoading, setInterviewLoading] = useState(false);
@@ -75,6 +79,10 @@ const InsightsPage: React.FC = () => {
     const [versions, setVersions] = useState<ResumeVersion[]>([]);
     const [versionsLoading, setVersionsLoading] = useState(false);
     const [versionsError, setVersionsError] = useState<string | null>(null);
+
+    const [jobs, setJobs] = useState<Job[]>([]);
+    const [jobsLoading, setJobsLoading] = useState(false);
+    const [jobsError, setJobsError] = useState<string | null>(null);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -128,6 +136,7 @@ const InsightsPage: React.FC = () => {
         { key: 'match', label: 'JD Match Map', icon: <Target className="w-4 h-4" /> },
         { key: 'interview', label: 'Interview Readiness', icon: <MessageSquareText className="w-4 h-4" /> },
         { key: 'timeline', label: 'Version Timeline', icon: <TrendingUp className="w-4 h-4" /> },
+        { key: 'jobs', label: 'Job Matches', icon: <Briefcase className="w-4 h-4" /> },
     ];
 
     const buildSummaryText = () => {
@@ -237,6 +246,50 @@ const InsightsPage: React.FC = () => {
             setInterviewError(error instanceof Error ? error.message : 'Failed to generate interview readiness');
         } finally {
             setInterviewLoading(false);
+        }
+    };
+
+    const runJobSearch = async () => {
+        setJobsError(null);
+        setJobsLoading(true);
+        try {
+            const query = targetJob || jobRole || 'Developer';
+            const result = await searchActiveJobs(query);
+            setJobs(result);
+        } catch (error) {
+            setJobsError(error instanceof Error ? error.message : 'Failed to search jobs');
+        } finally {
+            setJobsLoading(false);
+        }
+    };
+
+    const handleExportDocx = async () => {
+        if (!resumeText) return;
+        setExportingDocx(true);
+        try {
+            // Apply accepted rewrites to the original text
+            let finalResumeText = resumeText;
+            if (rewrite?.suggestions) {
+                rewrite.suggestions.forEach(item => {
+                    if (acceptedRewrites[item.id]) {
+                        finalResumeText = finalResumeText.replace(item.original, item.rewritten);
+                    }
+                });
+            }
+
+            const blob = await exportResumeDocx(finalResumeText);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rewritten_resume_${Date.now()}.docx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            alert(error instanceof Error ? error.message : 'Failed to export DOCX');
+        } finally {
+            setExportingDocx(false);
         }
     };
 
@@ -526,9 +579,14 @@ const InsightsPage: React.FC = () => {
 
                                     <div className="mt-5 flex items-center justify-between gap-3">
                                         <p className="text-sm text-gray-400">Projected score with accepted rewrites: <span className="text-white font-semibold">{projectedScore}/10</span></p>
-                                        <Button onClick={saveRewriteAsVersion} isLoading={savingVersion} disabled={acceptedCount < 1}>
-                                            Save as New Version
-                                        </Button>
+                                        <div className="flex gap-2">
+                                            <Button onClick={handleExportDocx} isLoading={exportingDocx} variant="ghost" disabled={!resumeText}>
+                                                Export to DOCX
+                                            </Button>
+                                            <Button onClick={saveRewriteAsVersion} isLoading={savingVersion} disabled={acceptedCount < 1}>
+                                                Save as New Version
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             </motion.section>
@@ -742,6 +800,82 @@ const InsightsPage: React.FC = () => {
                                                     <div className="text-right">
                                                         <p className="text-lg font-bold text-primary-300">{Number(item.score).toFixed(1)}</p>
                                                         <p className="text-xs text-gray-500">Score</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.section>
+                        )}
+
+                        {tab === 'jobs' && (
+                            <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="card p-7">
+                                    <div className="flex items-start justify-between gap-3 mb-4">
+                                        <div>
+                                            <h3 className="text-xl font-semibold text-white mb-1">Active Job Matches</h3>
+                                            <p className="text-gray-400 text-sm mb-5">Current remote job postings based on your detected role: <span className="font-semibold text-primary-300">{targetJob || jobRole}</span></p>
+                                        </div>
+                                        <Button onClick={runJobSearch} isLoading={jobsLoading}>
+                                            {jobs.length ? 'Refresh' : 'Search Jobs'}
+                                        </Button>
+                                    </div>
+
+                                    {jobsError && (
+                                        <div className="rounded-xl border border-error/30 bg-error/10 px-4 py-3 text-sm text-error mb-4">
+                                            {jobsError}
+                                        </div>
+                                    )}
+
+                                    {jobsLoading && (
+                                        <div className="rounded-2xl border border-white/[0.08] bg-surface-200/50 px-5 py-10 text-center text-gray-400">
+                                            <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+                                            Finding the best job matches...
+                                        </div>
+                                    )}
+
+                                    {!jobsLoading && jobs.length === 0 && !jobsError && (
+                                        <div className="rounded-2xl border border-white/[0.08] bg-surface-200/50 px-5 py-6 text-gray-400 text-sm">
+                                            Click 'Search Jobs' to find roles matching your profile.
+                                        </div>
+                                    )}
+
+                                    {!jobsLoading && jobs.length > 0 && (
+                                        <div className="space-y-4">
+                                            {jobs.map((job) => (
+                                                <div key={job.id} className="rounded-2xl border border-white/[0.08] bg-surface-200/50 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:bg-surface-300">
+                                                    <div className="flex gap-4 min-w-0">
+                                                        {job.company_logo ? (
+                                                            <div className="w-12 h-12 rounded-xl border border-white/[0.08] bg-white overflow-hidden flex-shrink-0">
+                                                                <img src={job.company_logo} alt={job.company_name} className="w-full h-full object-contain p-1" />
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-12 h-12 rounded-xl border border-white/[0.08] bg-surface-300 flex items-center justify-center flex-shrink-0">
+                                                                <Briefcase className="w-5 h-5 text-gray-400" />
+                                                            </div>
+                                                        )}
+                                                        <div className="min-w-0 flex flex-col justify-center">
+                                                            <h4 className="text-base text-white font-medium truncate">{job.title}</h4>
+                                                            <p className="text-sm text-gray-400 truncate mt-1">
+                                                                {job.company_name} • <span className="text-primary-300">{job.candidate_required_location}</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-3">
+                                                        {job.salary && (
+                                                            <span className="px-3 py-1 rounded-full text-xs font-semibold bg-success/10 text-success whitespace-nowrap hidden lg:inline-block">
+                                                                {job.salary}
+                                                            </span>
+                                                        )}
+                                                        <a 
+                                                            href={job.url} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            className="px-4 py-2 rounded-xl text-sm font-semibold bg-primary-500 text-white hover:bg-primary-400 whitespace-nowrap transition-colors"
+                                                        >
+                                                            Apply Now
+                                                        </a>
                                                     </div>
                                                 </div>
                                             ))}

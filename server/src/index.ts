@@ -9,6 +9,7 @@ import { connectDB } from "./config/db";
 
 import resumeRoutes from "./routes/resume";
 import authRoutes from "./routes/auth";
+import jobRoutes from "./routes/jobs";
 
 // ✅ Load environment variables
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
@@ -54,6 +55,7 @@ app.use((req, res, next) => {
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/resume", resumeRoutes);
+app.use("/api/jobs", jobRoutes);
 
 // ✅ Health check
 app.get("/api/health", (req, res) => {
