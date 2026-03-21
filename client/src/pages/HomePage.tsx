@@ -43,7 +43,15 @@ const HomePage: React.FC = () => {
     }, [navigate, jobRole]);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-surface">
+        <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-surface z-0 text-gray-100">
+            <div className="absolute top-0 right-1/4 w-[700px] h-[700px] bg-primary-500/10 blur-[150px] rounded-full animate-spotlight pointer-events-none mix-blend-screen -z-10" />
+            <div className="absolute bottom-0 left-[10%] w-[600px] h-[600px] bg-accent-violet/10 blur-[150px] rounded-full animate-pulse-slow pointer-events-none mix-blend-screen -z-10" />
+            
+            {/* Decorative Floating Nodes */}
+            <div className="absolute top-[25%] right-[15%] w-32 h-32 rounded-3xl bg-surface-100/50 border border-white/10 backdrop-blur-2xl animate-float pointer-events-none -z-10 rotate-12 shadow-2xl" />
+            <div className="absolute bottom-[35%] left-[8%] w-24 h-24 rounded-full bg-primary-500/10 border border-primary-500/20 backdrop-blur-2xl animate-float pointer-events-none -z-10 -rotate-12" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-[40%] left-[20%] w-16 h-16 rounded-2xl bg-accent-violet/10 border border-accent-violet/20 backdrop-blur-2xl animate-float pointer-events-none -z-10 mt-10" style={{ animationDelay: '4s' }} />
+
             <AnimatedBackground />
 
             <div className="relative z-10 w-full max-w-screen-xl px-6 py-12 md:py-24 flex flex-col items-center">

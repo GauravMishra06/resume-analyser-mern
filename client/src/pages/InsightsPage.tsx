@@ -322,7 +322,10 @@ const InsightsPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-surface pb-24 selection:bg-primary-500/20">
+        <div className="min-h-screen bg-surface pb-24 selection:bg-primary-500/20 z-0 relative overflow-hidden text-gray-100">
+            <div className="absolute top-0 right-1/4 w-[700px] h-[700px] bg-primary-500/10 blur-[150px] rounded-full animate-spotlight pointer-events-none mix-blend-screen -z-10" />
+            <div className="absolute bottom-0 left-[10%] w-[600px] h-[600px] bg-accent-violet/10 blur-[150px] rounded-full animate-pulse-slow pointer-events-none mix-blend-screen -z-10" />
+            
             <AnimatedBackground variant="subtle" />
 
             <motion.header
@@ -360,13 +363,13 @@ const InsightsPage: React.FC = () => {
                 </div>
             </motion.header>
 
-            <main className="container-wide py-8 relative z-10">
-                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
-                    <div className="xl:col-span-3">
+            <main className="container-wide py-12 relative z-10">
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 xl:gap-12 items-start">
+                    <div className="xl:col-span-4 2xl:col-span-3 sticky top-28 space-y-6">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="card-premium p-7 relative overflow-hidden"
+                            className="card-premium p-8 relative overflow-hidden"
                         >
                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-400 via-accent-cyan to-accent-violet" />
                             <div className="mb-6 text-center">
@@ -429,9 +432,9 @@ const InsightsPage: React.FC = () => {
                         </motion.div>
                     </div>
 
-                    <div className="xl:col-span-9 space-y-6">
-                        <div className="card p-3 overflow-x-auto">
-                            <div className="flex items-center gap-2 min-w-max">
+                    <div className="xl:col-span-8 2xl:col-span-9 space-y-8">
+                        <div className="card p-3 shadow-sm backdrop-blur-3xl sticky top-20 z-40 border-b border-white/[0.05]">
+                            <div className="flex flex-wrap items-center gap-2">
                                 {tabs.map((item) => (
                                     <button
                                         key={item.key}

@@ -54,20 +54,18 @@ const Header = () => {
           </Link>
 
           <nav className="flex items-center gap-6">
+            {isHome && !isLoggedIn && (
+              <div className="hidden md:flex items-center gap-8 mr-2 pr-6 border-r border-white/10">
+                <a href="#how-it-works" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors duration-300">How It Works</a>
+                <a href="#features" className="text-sm font-semibold text-gray-400 hover:text-white transition-colors duration-300">Features</a>
+              </div>
+            )}
             {!isHome && isLoggedIn && (
               <Link
                 to="/upload"
                 className="text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300 hover:scale-105"
               >
                 New Analysis
-              </Link>
-            )}
-            {!isLoggedIn && (
-              <Link
-                to="/#features"
-                className="hidden md:inline text-sm font-semibold text-gray-400 hover:text-white transition-all duration-300"
-              >
-                Learn More
               </Link>
             )}
             {isLoggedIn ? (

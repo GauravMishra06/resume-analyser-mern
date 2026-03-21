@@ -114,12 +114,12 @@ export const UploadCard: React.FC<UploadCardProps> = ({
                     transition-all duration-700 ease-expo cursor-pointer
                     overflow-hidden group
                     ${isDragging
-                        ? 'border-primary-400 bg-primary-500/[0.1] scale-[1.02] shadow-glow-lg'
+                        ? 'border-primary-400 bg-primary-500/[0.15] scale-[1.03] shadow-[0_0_80px_rgba(59,130,246,0.3)]'
                         : isError
-                            ? 'border-error/40 bg-error/[0.08]'
+                            ? 'border-error/50 bg-error/[0.1] shadow-[0_0_60px_rgba(239,68,68,0.2)]'
                             : isComplete
-                                ? 'border-success/40 bg-success/[0.08]'
-                                : 'border-white/[0.1] bg-surface-100/30 hover:border-primary-500/40 hover:bg-surface-100/40 hover:shadow-glow-md'
+                                ? 'border-success/50 bg-success/[0.1] shadow-[0_0_60px_rgba(34,197,94,0.2)]'
+                                : 'border-white/[0.15] bg-surface-100/40 hover:border-primary-500/50 hover:bg-surface-100/60 hover:shadow-[0_0_40px_rgba(59,130,246,0.2)]'
                     }
                     ${isProcessing ? 'pointer-events-none' : ''}
                 `}
@@ -216,7 +216,7 @@ export const UploadCard: React.FC<UploadCardProps> = ({
                                 {fileName ? (
                                     <FileText className="w-10 h-10" />
                                 ) : (
-                                    <Upload className="w-10 h-10" />
+                                    <Upload className="w-10 h-10 group-hover:-translate-y-1 transition-transform duration-300" />
                                 )}
                             </motion.div>
 

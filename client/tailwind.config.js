@@ -11,14 +11,14 @@ export default {
                 heading: ['DM Serif Display', 'Georgia', 'serif'],
             },
             colors: {
-                // Dark theme surface colors
+                // Dark theme surface colors - True Black LED optimized
                 surface: {
-                    DEFAULT: '#09090b',
-                    50: '#18181b',
-                    100: '#1e1e22',
-                    200: '#27272a',
-                    300: '#303036',
-                    400: '#3f3f46',
+                    DEFAULT: '#000000',
+                    50: '#0a0a0a',
+                    100: '#121212',
+                    200: '#1c1c1c',
+                    300: '#262626',
+                    400: '#333333',
                 },
                 // Neutral text/border shades for dark theme
                 gray: {
@@ -105,6 +105,8 @@ export default {
                 'float': 'float 8s ease-in-out infinite',
                 'glow-pulse': 'glowPulse 3s ease-in-out infinite',
                 'shimmer': 'shimmer 2s linear infinite',
+                'mesh': 'mesh 15s ease-in-out infinite alternate',
+                'spotlight': 'spotlight 2s ease .75s 1 forwards',
             },
             keyframes: {
                 fadeIn: {
@@ -138,6 +140,15 @@ export default {
                 shimmer: {
                     '0%': { backgroundPosition: '-200% 0' },
                     '100%': { backgroundPosition: '200% 0' },
+                },
+                mesh: {
+                    '0%': { backgroundPosition: '0% 50%' },
+                    '50%': { backgroundPosition: '100% 50%' },
+                    '100%': { backgroundPosition: '0% 50%' },
+                },
+                spotlight: {
+                    '0%': { opacity: '0', transform: 'translate(-72%, -62%) scale(0.5)' },
+                    '100%': { opacity: '1', transform: 'translate(-50%,-40%) scale(1)' },
                 },
             },
             transitionTimingFunction: {

@@ -58,7 +58,10 @@ const LandingPage: React.FC = () => {
     ];
 
     return (
-        <div className="min-h-screen flex flex-col items-center relative overflow-hidden bg-surface">
+        <div className="min-h-screen flex flex-col items-center relative overflow-hidden bg-surface z-0 text-gray-100">
+            <div className="absolute top-0 left-[20%] w-[800px] h-[800px] bg-primary-500/10 blur-[150px] rounded-full animate-spotlight pointer-events-none mix-blend-screen -z-10" />
+            <div className="absolute bottom-1/4 right-0 w-[600px] h-[800px] bg-accent-violet/10 blur-[150px] rounded-full animate-pulse-slow pointer-events-none mix-blend-screen -z-10" />
+            
             <AnimatedBackground />
 
             <div className="relative z-10 w-full max-w-screen-2xl px-6 lg:px-10 py-16 md:py-28 flex flex-col items-center">
@@ -142,9 +145,8 @@ const LandingPage: React.FC = () => {
                                         Analyze Resume
                                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                     </span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-accent-blue opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 </Link>
-                                <a href="#features" className="btn btn-secondary btn-lg">
+                                <a href="#how-it-works" className="btn btn-secondary btn-lg">
                                     See How It Works
                                 </a>
                             </motion.div>
@@ -226,7 +228,7 @@ const LandingPage: React.FC = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                    id="features"
+                    id="how-it-works"
                     className="w-full mb-36"
                 >
                     <div className="text-center mb-16 space-y-4">
@@ -287,6 +289,7 @@ const LandingPage: React.FC = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.8, delay: 0.15 }}
+                        id="features"
                         className="mt-14"
                     >
                         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">

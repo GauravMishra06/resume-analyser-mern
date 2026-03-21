@@ -28,15 +28,21 @@
   }
 
   body {
-    @apply font-sans text-gray-100 bg-surface min-h-screen;
+    @apply font-sans text-gray-100 bg-surface min-h-screen relative overflow-x-hidden;
     font-size: 17px;
     line-height: 1.5;
     letter-spacing: -0.011em;
-    background-image:
-      radial-gradient(1200px 600px at 10% -10%, rgba(34, 211, 238, 0.12), transparent 60%),
-      radial-gradient(1000px 500px at 90% -20%, rgba(59, 130, 246, 0.14), transparent 55%),
-      radial-gradient(900px 500px at 50% 120%, rgba(139, 92, 246, 0.1), transparent 60%);
-    background-attachment: fixed;
+  }
+
+  /* Animated Mesh Gradient Background */
+  body::before {
+    content: '';
+    @apply fixed inset-0 -z-10 w-full h-full pointer-events-none;
+    background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 40%);
+    background-size: 150% 150%;
+    animation: mesh 15s ease infinite alternate;
   }
 
   h1,
@@ -108,24 +114,23 @@
 
   /* Glass effect - Premium Apple-like */
   .glass {
-    @apply bg-surface-50/70 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)];
+    @apply bg-surface-50/60 backdrop-blur-3xl border border-white/[0.04] border-t-white/[0.1] shadow-[0_8px_32px_rgba(0,0,0,0.6)];
   }
 
   .glass-card {
-    @apply bg-surface-100/40 backdrop-blur-xl border border-white/[0.1] shadow-card hover:shadow-card-hover transition-all duration-500 ease-apple;
+    @apply bg-surface-100/40 backdrop-blur-3xl border border-white/[0.05] border-t-white/[0.08] shadow-card hover:shadow-card-hover transition-all duration-500 ease-apple;
     box-shadow: 
-      0 4px 24px rgba(0, 0, 0, 0.4), 
-      0 0 0 1px rgba(255, 255, 255, 0.05),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+      0 8px 32px rgba(0, 0, 0, 0.5), 
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
   }
 
   .glass-card:hover {
-    @apply border-white/[0.18] bg-surface-100/50;
-    transform: translateY(-2px);
+    @apply border-white/[0.1] border-t-white/[0.18] bg-surface-100/50;
+    transform: translateY(-4px);
     box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.5), 
-      0 0 0 1px rgba(255, 255, 255, 0.1),
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      0 16px 48px rgba(0, 0, 0, 0.6), 
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
   }
 
   /* Glow utility */
@@ -148,28 +153,28 @@
   }
 
   .gradient-blue {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 via-accent-blue to-accent-violet;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-300 via-primary-500 to-accent-cyan;
   }
 
   /* Button base styles - More refined */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl font-semibold text-[15px] transition-all duration-500 ease-apple disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-[0.97];
+    @apply inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-[1.125rem] font-semibold text-[15px] transition-all duration-300 ease-apple disabled:opacity-50 disabled:cursor-not-allowed transform active:scale-95;
   }
 
   .btn-primary {
-    @apply bg-primary-500 text-white hover:bg-primary-400 shadow-[0_4px_20px_rgba(59,130,246,0.3)] hover:shadow-[0_8px_30px_rgba(59,130,246,0.5)];
+    @apply bg-primary-600 text-white border border-primary-500/50 hover:border-primary-400 hover:bg-primary-500 shadow-[0_4px_20px_rgba(37,99,235,0.4)] hover:shadow-[0_8px_32px_rgba(37,99,235,0.6)];
   }
 
   .btn-accent {
-    @apply bg-gradient-to-r from-primary-500 to-accent-violet text-white hover:brightness-110 shadow-[0_4px_20px_rgba(139,92,246,0.3)] hover:shadow-[0_8px_30px_rgba(139,92,246,0.5)];
+    @apply bg-gradient-to-r from-primary-500 to-accent-violet text-white border border-white/10 hover:brightness-110 shadow-[0_4px_24px_rgba(139,92,246,0.4)] hover:shadow-[0_8px_40px_rgba(139,92,246,0.6)];
   }
 
   .btn-secondary {
-    @apply bg-white/5 text-white hover:bg-white/10 border border-white/10 backdrop-blur-md;
+    @apply bg-white/5 text-white hover:bg-white/10 border border-white/[0.08] border-t-white/[0.15] backdrop-blur-xl shadow-sm hover:shadow-md;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-gray-400 hover:bg-white/5 hover:text-white;
+    @apply bg-transparent text-gray-400 hover:bg-white/5 hover:text-white border border-transparent;
   }
 
   .btn-lg {

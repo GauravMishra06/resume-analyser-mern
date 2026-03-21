@@ -123,6 +123,10 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
                             <stop offset="0%" stopColor={tone.from} />
                             <stop offset="100%" stopColor={tone.to} />
                         </linearGradient>
+                        <filter id={`glow-${gradientId}`} x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="8" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
                     </defs>
 
                     {/* Background circle */}
@@ -178,6 +182,7 @@ export const ScoreRing: React.FC<ScoreRingProps> = ({
                         initial={animate ? "hidden" : "visible"}
                         animate="visible"
                         variants={circleVariants}
+                        style={{ filter: `url(#glow-${gradientId})` }}
                     />
                 </svg>
 
