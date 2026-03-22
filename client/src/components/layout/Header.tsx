@@ -30,7 +30,7 @@ const Header = () => {
     localStorage.removeItem("userName");
     setIsLoggedIn(false);
     setUserName("");
-    navigate("/login");
+    navigate("/");
   };
 
   return (
