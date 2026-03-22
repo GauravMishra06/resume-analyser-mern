@@ -3,7 +3,13 @@ import { logger } from './logger';
 /**
  * Required environment variables
  */
-const REQUIRED_ENV_VARS = ['GROQ_API_KEY', 'GEMINI_API_KEY'];
+const REQUIRED_ENV_VARS = [
+  "GROQ_API_KEY",
+  "GEMINI_API_KEY",
+  "MONGODB_URI",
+  "JWT_SECRET",
+  "CLIENT_URL",
+];
 
 /**
  * Validate that all required environment variables are present.
@@ -26,6 +32,7 @@ export function validateEnvironment(): void {
         logger.error('Example:');
         logger.error('   GROQ_API_KEY=your-groq-api-key');
         logger.error('   GEMINI_API_KEY=your-gemini-api-key');
+        logger.error('   CLIENT_URL=http://localhost:5173');
         logger.error('');
         process.exit(1);
     }
