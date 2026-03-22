@@ -30,8 +30,9 @@ export default function Register() {
     setError(null);
 
     try {
+      const apiUrl = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || 'http://localhost:3000/api';
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/register`,
+        `${apiUrl}/auth/register`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
