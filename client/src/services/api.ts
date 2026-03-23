@@ -6,11 +6,10 @@ import type {
     RewriteResponse,
     InterviewReadinessResponse,
     ResumeVersion,
-    Job,
 } from '../types';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, '') || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 /**
  * Get auth headers if token exists
@@ -189,35 +188,4 @@ export async function saveResumeVersion(payload: {
         throw new Error(data.error || 'Failed to save resume version');
     }
     return data.data;
-}
-
-export async function searchActiveJobs(query: string): Promise<Job[]> {
-    const response = await fetch(`${API_BASE_URL}/jobs/search?q=${encodeURIComponent(query)}`, {
-        headers: {
-            ...getAuthHeaders(),
-        },
-    });
-
-    const data: ApiResponse<Job[]> = await response.json();
-    if (!response.ok || !data.success || !data.data) {
-        throw new Error(data.error || 'Failed to search active jobs');
-    }
-    return data.data;
-}
-
-export async function exportResumeDocx(finalResumeText: string): Promise<Blob> {
-    const response = await fetch(`${API_BASE_URL}/resume/export`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            ...getAuthHeaders(),
-        },
-        body: JSON.stringify({ final_resume_text: finalResumeText }),
-    });
-
-    if (!response.ok) {
-        throw new Error('Failed to export DOCX');
-    }
-    
-    return await response.blob();
 }
