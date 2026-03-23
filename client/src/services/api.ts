@@ -6,6 +6,7 @@ import type {
     RewriteResponse,
     InterviewReadinessResponse,
     ResumeVersion,
+    Job,
 } from '../types';
 
 // API Configuration
@@ -188,4 +189,50 @@ export async function saveResumeVersion(payload: {
         throw new Error(data.error || 'Failed to save resume version');
     }
     return data.data;
+}
+
+export async function searchActiveJobs(query: string): Promise<Job[]> {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+        throw new Error('Search query is required');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/jobs/search?q=${encodeURIComponent(trimmedQuery)}`, {
+        headers: {
+            ...getAuthHeaders(),
+        },
+    });
+
+    const data: ApiResponse<Job[]> = await response.json();
+    if (!response.ok || !data.success) {
+        throw new Error(data.message || data.error || 'Failed to search active jobs');
+    }
+
+    return data.data ?? [];
+}
+
+export async function exportResumeDocx(finalResumeText: string): Promise<Blob> {
+    const response = await fetch(`${API_BASE_URL}/resume/export`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders(),
+        },
+        body: JSON.stringify({
+            final_resume_text: finalResumeText,
+        }),
+    });
+
+    if (!response.ok) {
+        let errorMessage = 'Failed to export DOCX';
+        try {
+            const errorData = (await response.json()) as ApiResponse<unknown>;
+            errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch {
+            // Ignore parse errors and use fallback message.
+        }
+        throw new Error(errorMessage);
+    }
+
+    return response.blob();
 }
