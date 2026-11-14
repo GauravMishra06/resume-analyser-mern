@@ -52,7 +52,7 @@ This repository is constructed as a **Monorepo** ensuring separated concerns bet
 
 ### Backend (Server)
 - **Node.js & Express**: Provides the lightweight and unopinionated server architecture.
-- **TypeScript**: Adds static typing to backend logic, reducing runtime bugs.
+- **JavaScript**: Fast, flexible, and robust backend logic built with Node.js and Express.
 - **MongoDB (Mongoose)**: A NoSQL data layer used to persistently store user profiles, credentials, and potentially resume analysis history.
 - **Multer**: Middleware handles `multipart/form-data`, ensuring safe and configurable resume file uploads.
 - **AI SDKs (`@google/generative-ai`, `groq-sdk`)**: Offloads the heavy natural language processing tasks to cloud LLMs.
@@ -73,11 +73,11 @@ AIRESUMEANALYZER/
 ├── server/                     # Express API Backend
 │   ├── src/
 │   │   ├── config/             # DB connection hooks & Env configs
-│   │   ├── controllers/        # Route controllers (e.g., authController.ts)
+│   │   ├── controllers/        # Route controllers (e.g., authController.js)
 │   │   ├── middleware/         # Custom pipeline tools (Auth guards, Rate limiting)
 │   │   ├── models/             # Mongoose DB schemas (Users, Resumes)
-│   │   ├── routes/             # API routing (auth.ts, resume.ts, jobs.ts)
-│   │   └── services/           # Core business logic (fileService.ts, resumeLLMService.ts)
+│   │   ├── routes/             # API routing (auth.js, resume.js, jobs.js)
+│   │   └── services/           # Core business logic (fileService.js, resumeLLMService.js)
 │   └── package.json
 │
 └── package.json                # Root package manager & workspace definitions
@@ -160,7 +160,7 @@ Below is a brief overview of the core endpoints exposed by the Node server.
 ### Resume Analysis
 - `POST /api/resume/analyze`
   **Requires Authentication.**
-   Accepts a `multipart/form-data` payload containing the file under the key `resume`. The backend parses it, queries the LLM service (`resumeLLMService.ts`), and returns the detailed JSON analysis.
+   Accepts a `multipart/form-data` payload containing the file under the key `resume`. The backend parses it, queries the LLM service (`resumeLLMService.js`), and returns the detailed JSON analysis.
 
 ### Job Matching
 - `GET /api/jobs`
