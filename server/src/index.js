@@ -11,8 +11,9 @@ const resumeRoutes = require("./routes/resume");
 const authRoutes = require("./routes/auth");
 const jobRoutes = require("./routes/jobs");
 
-// Load environment variables
+// Load environment variables (server/.env or root .env)
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // Validate env variables
 validateEnvironment();

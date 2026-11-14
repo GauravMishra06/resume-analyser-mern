@@ -133,7 +133,7 @@ To efficiently run the project in development mode, open two separate terminal s
 ```bash
 cd server
 npm run dev
-# Starts the server on http://localhost:3000 using tsx watch for hot-reloading
+# Starts the server on http://localhost:3000 using node --watch for hot-reloading
 ```
 
 **Terminal 2 (Frontend Client):**
